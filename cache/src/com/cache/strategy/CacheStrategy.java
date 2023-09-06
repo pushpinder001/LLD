@@ -1,7 +1,7 @@
 package com.cache.strategy;
 
-public interface CacheStrategy {
-    boolean notifyAccess(String key);
+public interface CacheStrategy<K> {
+    boolean keyAccessed(K key);
 
-    String evict();
+    K evictKey();
 }

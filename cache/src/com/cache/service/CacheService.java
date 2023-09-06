@@ -1,51 +1,52 @@
 package com.cache.service;
 
 import com.cache.client.CacheClient;
+import com.cache.exception.StorageFullException;
+import com.cache.storage.Storage;
+import com.cache.storage.impl.HashMapStorage;
 import com.cache.strategy.CacheStrategy;
+import com.cache.strategy.CacheStrategyFactory;
 import com.cache.strategy.Type;
-import com.cache.strategy.impl.LRUStrategy;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class CacheService <V> implements CacheClient {
-
-    private static CacheStrategy getCacheStrategy(Type strategy) {
-        return switch(strategy) {
-            case LRU -> new LRUStrategy();
-            default -> throw new RuntimeException(strategy + " is not valid");
-        };
-    }
-
+public class CacheService <K, V> implements CacheClient {
     private CacheStrategy cacheStrategy;
 
-    Map<String, V> dataStore;
+    Storage dataStore;
 
     int capacity;
 
-    public CacheService(Type type, Integer capacity) {
-        this.cacheStrategy = getCacheStrategy(type);
-        this.dataStore = new ConcurrentHashMap<>();
+    public CacheService(Type type, Integer capacity, Storage storage) {
+        this.cacheStrategy = CacheStrategyFactory.getCacheStrategy(type);
+        this.dataStore = storage;
         this.capacity = capacity;
     }
 
     @Override
     public Optional<V> get(String key) {
-        V val = dataStore.get(key);
-        this.cacheStrategy.notifyAccess(key);
-        return Optional.of(val);
+        Object val = dataStore.get(key);
+        if(val == null) {
+            return Optional.of(null);
+        }
+
+        this.cacheStrategy.keyAccessed(key);
+        return Optional.of((V)val);
     }
 
     @Override
     public boolean put(String key, Object val) {
-        dataStore.put(key, (V)val);
-        if(dataStore.size() > capacity) {
-            this.cacheStrategy.evict();
-        } else {
-            this.cacheStrategy.notifyAccess(key);
-        }
+        try {
+            dataStore.put(key, (V) val);
+            cacheStrategy.keyAccessed(key);
+        } catch (StorageFullException e) {
+            Object evictedKey = this.cacheStrategy.evictKey();
+            if(evictedKey != null) {
+                dataStore.remove(evictedKey);
+            }
 
+            put(key, val);
+        }
         return true;
     }
 
