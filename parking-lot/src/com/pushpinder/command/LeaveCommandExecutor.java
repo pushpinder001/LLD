@@ -1,6 +1,7 @@
 package com.pushpinder.command;
 
 import com.pushpinder.exception.NoCarPresentForSlot;
+import com.pushpinder.model.Command;
 import com.pushpinder.service.ParkingLotService;
 
 public class LeaveCommandExecutor extends CommandExecutor{
@@ -9,15 +10,15 @@ public class LeaveCommandExecutor extends CommandExecutor{
     }
 
     @Override
-    protected boolean validate(String[] commandSplits) {
+    protected boolean validate(Command command) {
         return true;
     }
 
     @Override
-    public void process(String[] commandSplits) {
+    public void process(Command command) {
         try {
-            parkingLotService.unPark(Integer.parseInt(commandSplits[1]));
-            System.out.printf("Slot number %s is free\n", commandSplits[1]);
+            parkingLotService.unPark(Integer.parseInt(command.getCommandParams().get(0)));
+            System.out.printf("Slot number %s is free\n", command.getCommandParams().get(0));
         } catch (NoCarPresentForSlot e) {
             System.out.println(e);
         }

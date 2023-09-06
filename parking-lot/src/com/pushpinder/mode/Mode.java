@@ -3,6 +3,7 @@ package com.pushpinder.mode;
 import com.pushpinder.command.CommandExecutor;
 import com.pushpinder.command.CommandExecutorFactory;
 import com.pushpinder.exception.NoCommandFoundException;
+import com.pushpinder.model.Command;
 import com.pushpinder.service.ParkingLotService;
 
 public abstract class Mode {
@@ -14,14 +15,9 @@ public abstract class Mode {
     }
 
     protected void executeCommand(String cmd) throws NoCommandFoundException {
-        String[] splits = cmd.split(" ");
-
-        if(splits.length ==0) {
-            return;
-        }
-
-        CommandExecutor commandExecutor = commandExecutorFactory.getCommandExecutor(splits[0]);
-        commandExecutor.processCmd(splits);
+        Command command = new Command(cmd);
+        CommandExecutor commandExecutor = commandExecutorFactory.getCommandExecutor(command);
+        commandExecutor.processCmd(command);
     }
 
     public abstract void process();

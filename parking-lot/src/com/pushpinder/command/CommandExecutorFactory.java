@@ -1,6 +1,7 @@
 package com.pushpinder.command;
 
 import com.pushpinder.exception.NoCommandFoundException;
+import com.pushpinder.model.Command;
 import com.pushpinder.model.ParkingLot;
 import com.pushpinder.service.ParkingLotService;
 
@@ -23,15 +24,16 @@ public final class CommandExecutorFactory {
     static {
 
     }
-    public CommandExecutor getCommandExecutor(String cmd) throws NoCommandFoundException {
-       if(cmd.equals(CommandType.create_parking_lot.name())) {
+    public CommandExecutor getCommandExecutor(Command command) throws NoCommandFoundException {
+        String cmd = command.getName();
+        if(cmd.equals(CommandType.create_parking_lot.name())) {
            return commandToCommandExecutor.get(CommandType.create_parking_lot.name());
-       } else if(cmd.equals(CommandType.park.name())) {
+        } else if(cmd.equals(CommandType.park.name())) {
             return commandToCommandExecutor.get(CommandType.park.name());
-       } else if(cmd.equals(CommandType.leave.name())) {
+        } else if(cmd.equals(CommandType.leave.name())) {
             return commandToCommandExecutor.get(CommandType.leave.name());
-       } else {
+        } else {
             throw new NoCommandFoundException();
-       }
+        }
     }
 }

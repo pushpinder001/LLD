@@ -2,6 +2,7 @@ package com.pushpinder.command;
 
 import com.pushpinder.exception.ParkingLotFullException;
 import com.pushpinder.model.Car;
+import com.pushpinder.model.Command;
 import com.pushpinder.model.Ticket;
 import com.pushpinder.service.ParkingLotService;
 
@@ -11,14 +12,15 @@ public class ParkCommandExecutor extends CommandExecutor{
     }
 
     @Override
-    protected boolean validate(String[] commandSplits) {
+    protected boolean validate(Command command) {
         return true;
     }
 
     @Override
-    public void process(String[] commandSplits) {
+    public void process(Command command) {
         try {
-            Ticket ticket = parkingLotService.park(new Car(commandSplits[2], commandSplits[1]));
+            Ticket ticket = parkingLotService.park(new Car(command.getCommandParams().get(1),
+                    command.getCommandParams().get(0)));
             System.out.printf("Allocated slot number: %s\n", ticket.slotNo);
         } catch (ParkingLotFullException e) {
             System.out.println(e);
