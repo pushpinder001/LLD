@@ -35,7 +35,7 @@ public abstract class Piece {
         this.type = type;
     }
 
-    protected boolean validateMove(int row, int col) {
+    public boolean validateMove(int row, int col) {
         List<Position> possibleMoves = nextMoves();
         Optional<Position> pos = possibleMoves.stream()
                 .filter(position -> position.row()==row && position.col()==col).findFirst();
@@ -47,24 +47,19 @@ public abstract class Piece {
 
     public abstract List<Position> nextMoves();
 
-    public boolean move(int row, int col) {
-        if(Board.validPosition(row, col) && validateMove(row, col)) {
-            if(this.board.hasPiece(row, col)) this.board.removePiece(row, col);
-
-            this.board.addPiece(this, row, col);
-            this.board.removePiece(curRow, curCol);
-            curRow = row;
-            curCol = col;
-            return true;
-        }
-        return false;
-    }
-
     public ChessGamePieceColor getColor() {
         return color;
     }
 
     public Type getType() {
         return type;
+    }
+
+    public void setCurRow(int curRow) {
+        this.curRow = curRow;
+    }
+
+    public void setCurCol(int curCol) {
+        this.curCol = curCol;
     }
 }

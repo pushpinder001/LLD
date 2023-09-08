@@ -8,7 +8,7 @@ import model.peices.Piece;
 
 import java.util.List;
 
-public class ChessGame {
+public class ChessGameServiceImpl implements ChessGameService{
     private Board board;
     private List<Player> players;
 
@@ -16,9 +16,9 @@ public class ChessGame {
 
     private Player winner;
 
-    public ChessGame() {
+    public ChessGameServiceImpl(Board board) {
         this.players = List.of(new Player(ChessGamePieceColor.WHITE.ordinal()), new Player(ChessGamePieceColor.BLACK.ordinal()));
-        this.board = new Board();
+        this.board = board;
         this.turn = 0;
         this.winner = null;
     }
@@ -42,17 +42,19 @@ public class ChessGame {
         return piece;
     }
 
-    private boolean validate() {
+    private boolean validate(int playerId) {
         if(this.winner != null) {
             throw new RuntimeException(String.format("Player %d has won", this.winner.getId()));
         }
+        if(turn != playerId) {
+            throw new RuntimeException("Cannot move without turn");
+        }
         return true;
     }
+
+    @Override
     public List<Position> nextMoves(int playerId, Position curPos) {
-        validate();
-        if(turn != playerId ) {
-            throw new RuntimeException("Cannot check move without turn");
-        }
+        validate(playerId);
 
         Piece piece = getPieceForPosition(curPos);
         if(turn != piece.getColor().ordinal() ) {
@@ -61,25 +63,33 @@ public class ChessGame {
         return piece.nextMoves();
     }
 
+    @Override
     public boolean move(int playerId, Position curPos, Position targetPos) {
-        validate();
-        Piece targetPosPiece = board.getCell(targetPos.row(), targetPos.col()).getPiece();
+        int targetRow = targetPos.row();
+        int targetCol = targetPos.col();
 
-        //Logic for winning
-        if(turn != playerId ) {
-            throw new RuntimeException("Cannot move without turn");
-        }
-
+        validate(playerId);
+        Piece targetPosPiece = this.board.getPiece(targetRow, targetCol);
         Piece piece = getPieceForPosition(curPos);
-        piece.move(targetPos.row(), targetPos.col());
 
-        if(!checkForWin(piece, targetPosPiece)) {
-            turn = 1 - turn;
+        if(piece.validateMove(targetRow, targetCol)) {
+            if(this.board.hasPiece(targetRow, targetCol)) this.board.removePiece(targetRow, targetCol);
+
+            this.board.addPiece(piece, targetRow, targetCol);
+            this.board.removePiece(curPos.row(), curPos.col());
+            piece.setCurRow(targetRow);
+            piece.setCurCol(targetCol);
+
+            if(!checkForWin(piece, targetPosPiece)) {
+                turn = 1 - turn;
+            }
+            return true;
         }
+        return false;
 
-        return true;
     }
 
+    @Override
     public void printBoard() {
         System.out.println(board.toString());
     }

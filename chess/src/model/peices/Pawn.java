@@ -2,7 +2,6 @@ package model.peices;
 
 import dto.Position;
 import model.Board;
-import service.ChessGame;
 import service.ChessGamePieceColor;
 
 import java.util.ArrayList;
@@ -34,25 +33,5 @@ public class Pawn extends Piece{
             nextMoves.add(new Position(curRow+dir, curCol+1));
         }
         return nextMoves;
-    }
-
-    @Override
-    public boolean move(int row, int col) {
-        if(Board.validPosition(row, col) && validateMove(row, col)) {
-            if(this.board.hasPiece(row, col)) this.board.removePiece(row, col);
-
-            this.board.addPiece(this, row, col);
-            this.board.removePiece(curRow, curCol);
-            curRow = row;
-            curCol = col;
-
-            if(!hasMoved) hasMoved=true;
-            if(row ==0 || row == Board.getROWS()-1) {
-                this.board.addPiece(new Queen(color, row, col, board),row, col);
-            }
-            return true;
-        }
-
-        return false;
     }
 }

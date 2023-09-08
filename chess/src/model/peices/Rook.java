@@ -2,7 +2,6 @@ package model.peices;
 
 import dto.Position;
 import model.Board;
-import service.ChessGame;
 import service.ChessGamePieceColor;
 
 import java.util.ArrayList;
