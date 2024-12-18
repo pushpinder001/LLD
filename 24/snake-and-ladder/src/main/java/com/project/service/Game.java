@@ -36,7 +36,6 @@ public class Game {
 
     public void startGame() {
         if(gameState == GameState.NOT_STARTED) {
-
             gameState = GameState.STARTED;
             playGame();
         }
