@@ -24,7 +24,7 @@ public class AddTransactionCommandHandler implements ICommandHandler {
         int payerId = Integer.parseInt(params[0]);
         double amount = Double.parseDouble(params[1]);
         int userId = Integer.parseInt(params[2]);
-        TransactionType transactionType = TransactionType.getCommandType(params[3]);
+        TransactionType transactionType = TransactionType.valueOf(params[3]);
 
         Map<Integer, Double> map = new HashMap<>();
         for(int i=4; i<params.length; i+=2) {

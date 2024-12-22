@@ -22,7 +22,7 @@ public class CommandRunner {
         String[] splits = cmd.split(delimiter);
 
         String command = splits[0];
-        CommandType commandType = CommandType.getCommandType(command);
+        CommandType commandType = CommandType.valueOf(command);
 
         //Validation
         if(commandType == null) {
