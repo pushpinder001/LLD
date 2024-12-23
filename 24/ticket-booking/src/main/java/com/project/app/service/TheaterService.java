@@ -1,43 +1,29 @@
 package com.project.app.service;
 
-import com.project.app.dao.IShowRepo;
-import com.project.app.dao.ITheaterRepo;
 import com.project.app.entity.Seat;
-import com.project.app.entity.Show;
 import com.project.app.entity.Theater;
+import lombok.NonNull;
 
-import java.util.List;
+import java.util.*;
 
 public class TheaterService {
-    ITheaterRepo theaterRepo;
-    IShowRepo iShowRepo;
+    Map<String, Theater> theaterIdToTheaterMapping;
 
-    public TheaterService(ITheaterRepo theaterRepo, IShowRepo iShowRepo) {
-        this.theaterRepo = theaterRepo;
-        this.iShowRepo = iShowRepo;
+    public TheaterService() {
+        theaterIdToTheaterMapping = new HashMap<>();
     }
 
-    public int createTheater(List<Seat> seats) {
-        Theater theater = Theater.builder().seat(seats).build();
-        return theaterRepo.save(theater).getId();
+    public String createTheater(@NonNull final List<Seat> seats) {
+        Theater theater = new Theater(UUID.randomUUID().toString(), seats);
+        theaterIdToTheaterMapping.put(theater.getId(), theater);
+        return theater.getId();
     }
 
-    public int createShow(Show show) {
-        //TODO:: Add validation
-        return iShowRepo.save(show).getId();
-    }
-
-    public List<Seat> getAllSeats(int showId) {
-        int theaterId = iShowRepo.getById(showId).get().getTheaterId();
-
-        return theaterRepo.getById(theaterId).get().getSeat();
+    public List<Seat> getAllSeats(@NonNull final String theaterId) {
+        return Collections.unmodifiableList(theaterIdToTheaterMapping.get(theaterId).getSeat());
     }
 
     public void listAllTheaters() {
-        System.out.println(theaterRepo.listAllTheater());
-    }
-
-    public void listAllShows() {
-        System.out.println(iShowRepo.getShows());
+        System.out.println(theaterIdToTheaterMapping.values());
     }
 }

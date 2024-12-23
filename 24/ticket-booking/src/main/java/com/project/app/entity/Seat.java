@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class Seat {
-    char row;
+    final char row;
 
-    int seatId;
+    final int seatId;
 
     public String toString() {
         return "" + row + seatId;

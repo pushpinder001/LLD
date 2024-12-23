@@ -1,21 +1,25 @@
 package com.project.app.service;
 
-import com.project.app.dao.IUserRepo;
 import com.project.app.entity.User;
 
-public class UserService {
-    IUserRepo userRepo;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-    public UserService(IUserRepo userRepo) {
-        this.userRepo = userRepo;
+public class UserService {
+    Map<String, User> userIdToUserMapping;
+
+    public UserService() {
+        this.userIdToUserMapping = new HashMap<>();
     }
 
-    public int createUser() {
-        User user = new User();
-        return userRepo.save(user).getId();
+    public String createUser() {
+        User user = new User(UUID.randomUUID().toString());
+        this.userIdToUserMapping.put(user.getId(), user);
+        return user.toString();
     }
 
     public void listAllUser() {
-        System.out.println(userRepo.getAllUsers());
+        System.out.println(userIdToUserMapping.values());
     }
 }

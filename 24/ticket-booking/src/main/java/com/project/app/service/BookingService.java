@@ -1,84 +1,70 @@
 package com.project.app.service;
 
-import com.project.app.dao.IBookingRepo;
 import com.project.app.entity.Booking;
-import com.project.app.entity.Seat;
 import com.project.app.type.BookingStatus;
+import lombok.NonNull;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
 // SeatId, UserId
 public class BookingService {
-    IBookingRepo bookingRepo;
-    ILockService lockService;
-    TheaterService theaterService;
+    final Map<String, Booking> bookingIdToBookingMapping;
+    final ILockService lockService;
+    final TheaterService theaterService;
+    final ShowService showService;
     int ttl = 1 * 60;
 
-    public BookingService(IBookingRepo bookingRepo, ILockService lockService, TheaterService theaterService) {
-        this.bookingRepo = bookingRepo;
+    public BookingService(ILockService lockService, TheaterService theaterService,
+                          ShowService showService) {
         this.lockService = lockService;
         this.theaterService = theaterService;
+        this.showService = showService;
+        this.bookingIdToBookingMapping = new HashMap<>();
     }
 
-    public Map<String, BookingStatus> getSeatAvailForShow(int showId) {
-        //get all seat for theater
-        List<Seat> seats = theaterService.getAllSeats(showId);
 
-        Map<String, BookingStatus> seatIdToBookingStatus = new HashMap<>();
-        for (var seat : seats) {
-            seatIdToBookingStatus.put(seat.toString(), BookingStatus.UNRESERVED);
-        }
-
-        List<String> lockedSeatsForShow = getLockedSeat(showId);
-        for (var seat : lockedSeatsForShow) {
-            seatIdToBookingStatus.put(seat, BookingStatus.RESERVED);
-        }
-
-        List<String> bookedSeatForShow = getBookedSeat(showId);
-        for (var seat : bookedSeatForShow) {
-            seatIdToBookingStatus.put(seat, BookingStatus.BOOKED);
-        }
-
-        return seatIdToBookingStatus;
-    }
-
-    public Booking reserveSeat(int userId, int showId, String seatId) {
+    public String reserveSeat(@NonNull final String userId, @NonNull final String showId,
+                               @NonNull final String seatId) {
         //TODO:: validate if seat is available
-        boolean locked = lockService.getLock("" + showId, seatId, "" + userId, ttl);
+        boolean locked = lockService.getLock(showId, seatId,  userId, ttl);
 
         if (!locked) {
             throw new RuntimeException("Seat Unavailable");
         }
 
-        Booking booking = Booking.builder()
-                .bookingStatus(BookingStatus.RESERVED)
-                .userId(userId)
-                .showId(showId)
-                .seatIds(List.of(seatId))
-                .build();
+        Booking booking = new Booking(UUID.randomUUID().toString(), BookingStatus.RESERVED,
+                userId, List.of(seatId), showId);
 
-        return bookingRepo.save(booking);
+        bookingIdToBookingMapping.put(booking.getId(), booking);
+        return booking.getId();
     }
 
-    public Booking confirmBooking(int bookingId) {
-        Booking booking = bookingRepo.getBookingById(bookingId);
-        boolean isLockAcquired = lockService.isLockAcquiredWithValue("" + booking.getShowId(),
-                "" + booking.getSeatIds().get(0), "" + booking.getUserId(), ttl);
+    public boolean confirmBooking(@NonNull final String bookingId) {
+        //TODO:: validate
+        Booking booking = this.bookingIdToBookingMapping.get(bookingId);
+        boolean isLockAcquired = lockService.isLockAcquiredWithValue( booking.getShowId(),
+                 booking.getSeatIds().get(0), booking.getUserId(), ttl);
 
         if(!isLockAcquired) {
-            throw new RuntimeException("Unable to book as reservation timedout");
+            return false;
         }
 
-        booking.setBookingStatus(BookingStatus.BOOKED);
-        return bookingRepo.save(booking);
+        if(booking.bookSeat()) {
+            return false;
+        }
+
+        return true;
     }
 
-    private List<String> getLockedSeat(int showId) {
-        return lockService.getLockedKeysWithKeyPrefix("" + showId);
-    }
-
-    private List<String> getBookedSeat(int showId) {
-        return bookingRepo.getBookingsByShowIdAndStatus(showId, BookingStatus.BOOKED);
+    public List<String> getBookedSeat(@NonNull final String showId) {
+        return bookingIdToBookingMapping.values()
+                .stream()
+                .filter(b -> b.getShowId().equals(showId) &&
+                        b.getBookingStatus() == BookingStatus.BOOKED)
+                .flatMap(b -> b.getSeatIds().stream())
+                .toList();
     }
 }

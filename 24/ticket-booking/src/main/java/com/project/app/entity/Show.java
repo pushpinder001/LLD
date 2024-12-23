@@ -5,18 +5,16 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
 @ToString
 public class Show {
-    int id;
+    final String id;
 
-    int theaterId;
+    final String theaterId;
 
-    String movieName;
+    final String movieName;
 
-    LocalDateTime startTime;
+    final LocalDateTime startTime;
 
-    LocalDateTime endTime;
+    final int duration;
 }

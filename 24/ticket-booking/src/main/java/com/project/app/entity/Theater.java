@@ -5,13 +5,10 @@ import lombok.*;
 import java.util.List;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
-@Builder(toBuilder = true)
-@Setter
 @ToString
 public class Theater {
-    int id;
+    final String id;
 
-    List<Seat> seat;
+    final List<Seat> seat;
 }

@@ -5,22 +5,25 @@ import lombok.*;
 
 import java.util.List;
 
-@NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
 @Getter
-@Setter
 @ToString
 public class Booking {
-    Integer id;
+    final String id;
 
     BookingStatus bookingStatus;
 
-    int userId;
+    final String userId;
 
-    int paymentId;
+    final List<String> seatIds;
 
-    List<String> seatIds;
+    final String showId;
 
-    int showId;
+    public boolean bookSeat() {
+        if( bookingStatus ==  BookingStatus.RESERVED) {
+            this.bookingStatus = BookingStatus.BOOKED;
+            return true;
+        }
+        return false;
+    }
 }
