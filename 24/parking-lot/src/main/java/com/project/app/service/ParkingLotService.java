@@ -58,18 +58,32 @@ public class ParkingLotService {
 
     public void getStatus() {
         System.out.println("Slot No. Registration No Colour");
-        System.out.println(slots);
+        for(var slot : slots) {
+            if(!slot.isSlotFree()) {
+                System.out.printf("%7d %15s %6s\n", slot.getSlotNo(), slot.getTicket().getRegNo(),
+                        slot.getTicket().getColor());
+            }
+        }
     }
 
-    private List<String> getRegNoForCarWithColor(@NonNull final String color) {
-        return List.of();
+    public List<String> getRegNoForCarWithColor(@NonNull final String color) {
+        return slots.stream().filter(slot -> !slot.isSlotFree())
+                .map(Slot::getTicket)
+                .map(Ticket::getRegNo)
+                .toList();
     }
 
-    private List<Integer> getSlotNoForCarWithColor(@NonNull final String color) {
-        return List.of();
+    public List<Integer> getSlotNosForCarWithColor(@NonNull final String color) {
+        return slots.stream().filter(slot -> !slot.isSlotFree())
+                .filter(slot -> slot.getTicket().getColor().equals(color))
+                .map(Slot::getSlotNo)
+                .toList();
     }
 
-    private Integer getSlotNoForRegNo(@NonNull final String regNo) {
-        return null;
+    public Integer getSlotNoForRegNo(@NonNull final String regNo) throws Exception {
+        return slots.stream().filter(slot -> !slot.isSlotFree())
+                .filter(slot -> slot.getTicket().getRegNo().equals(regNo))
+                .map(Slot::getSlotNo)
+                .findFirst().orElseThrow(() -> new Exception("Not found"));
     }
 }

@@ -2,7 +2,12 @@ package com.project.app.command.strategy;
 
 import com.project.app.service.ParkingLotService;
 
-public class StatusCommandStrategy extends ICommandStrategy{
+public class StatusCommandStrategy implements ICommandStrategy{
+    @Override
+    public boolean validateParams(String[] params) {
+        return true;
+    }
+
     @Override
     public boolean doYouHandleIt(String cmd) {
         return "status".equals(cmd);

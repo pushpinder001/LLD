@@ -2,7 +2,12 @@ package com.project.app.command.strategy;
 
 import com.project.app.service.factory.ParkingLotFactory;
 
-public class CreateParkingLotCommandStrategy extends ICommandStrategy{
+public class CreateParkingLotCommandStrategy implements ICommandStrategy{
+
+    @Override
+    public boolean validateParams(String[] params) {
+        return params.length>0;
+    }
 
     @Override
     public boolean doYouHandleIt(String cmd) {

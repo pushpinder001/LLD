@@ -23,11 +23,4 @@ public class Slot {
         return ticket==null;
     }
 
-    @Override
-    public String toString() {
-        return "Slot{" +
-                "slotNo=" + slotNo +
-                ", ticket=" + ticket +
-                "}\n";
-    }
 }

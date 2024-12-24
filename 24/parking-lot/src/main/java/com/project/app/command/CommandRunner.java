@@ -28,8 +28,11 @@ public class CommandRunner {
             return;
         }
 
-        //TODO::Add validation
         String[] params = Arrays.asList(splits).subList(1, splits.length).toArray(String[]::new);
+        if(!cmdStr.validateParams(params)) {
+            System.out.println("Invalid command params");
+            return;
+        }
         cmdStr.execute(params);
     }
 }

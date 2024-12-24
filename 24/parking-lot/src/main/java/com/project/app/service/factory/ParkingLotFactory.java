@@ -10,7 +10,7 @@ import java.util.List;
 public class ParkingLotFactory {
     public static void createParkingLot(int noOfSlots) {
         List<Slot> slots = new ArrayList<>();
-        for(int i=0; i<noOfSlots; i++) {
+        for(int i=1; i<=noOfSlots; i++) {
             slots.add(new Slot(i));
         }
 

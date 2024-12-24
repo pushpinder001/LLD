@@ -1,10 +1,7 @@
 package com.project.app;
 
 import com.project.app.command.CommandRunner;
-import com.project.app.command.strategy.CreateParkingLotCommandStrategy;
-import com.project.app.command.strategy.LeaveVehicleCommandStrategy;
-import com.project.app.command.strategy.ParkVehicleCommandStrategy;
-import com.project.app.command.strategy.StatusCommandStrategy;
+import com.project.app.command.strategy.*;
 
 import java.util.List;
 import java.util.Scanner;
@@ -18,7 +15,8 @@ public class App {
     public static void main(String[] args) {
         commandRunner = new CommandRunner(List.of(new CreateParkingLotCommandStrategy(),
                 new ParkVehicleCommandStrategy(), new LeaveVehicleCommandStrategy(),
-                new StatusCommandStrategy()));
+                new StatusCommandStrategy(), new GetRegistrationNoForColorCommandStrategy(),
+                new GetSlotNoForRegNoCommandStrategy(), new GetSlotNosForCarColorCommandStrategy()));
 
         while(true) {
             System.out.println("Enter command : ");
