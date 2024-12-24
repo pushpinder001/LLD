@@ -4,7 +4,11 @@ import com.project.app.service.ParkingLotService;
 
 import java.util.List;
 
-public class GetRegistrationNoForColorCommandHandler implements ICommandHandler{
+public class GetRegistrationNoForColorCommandHandler extends ICommandHandler{
+    public GetRegistrationNoForColorCommandHandler(ParkingLotService parkingLotService) {
+        super(parkingLotService);
+    }
+
     @Override
     public boolean validateParams(String[] params) {
         return params.length>0;
@@ -17,7 +21,7 @@ public class GetRegistrationNoForColorCommandHandler implements ICommandHandler{
 
     @Override
     public void execute(String[] params) {
-        List<String> regNos = ParkingLotService.getInstance().getRegNoForCarWithColor(params[0]);
+        List<String> regNos = parkingLotService.getRegNoForCarWithColor(params[0]);
         System.out.println(regNos);
     }
 }

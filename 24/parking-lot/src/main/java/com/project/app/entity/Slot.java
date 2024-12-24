@@ -1,6 +1,7 @@
 package com.project.app.entity;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Getter
@@ -21,6 +22,11 @@ public class Slot {
 
     public boolean isSlotFree() {
         return ticket==null;
+    }
+
+    public boolean addTicket(@NonNull final Ticket ticket) {
+        this.ticket = ticket;
+        return true;
     }
 
 }

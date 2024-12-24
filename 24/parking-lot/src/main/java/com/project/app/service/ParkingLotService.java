@@ -1,39 +1,29 @@
 package com.project.app.service;
 
 
-import com.project.app.entity.Slot;
+import com.project.app.entity.ParkingLot;
 import com.project.app.entity.Ticket;
 import com.project.app.service.strategy.ISlotFinderStrategy;
 import lombok.NonNull;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class ParkingLotService {
-    private List<Slot> slots;
+    private ParkingLot parkingLot;
     private ISlotFinderStrategy slotFinderStrategy;
-    private final Map<String, Ticket> ticketIdToTicketMap;
 
-    private static ParkingLotService parkingLotService = null;
+    public ParkingLotService() {
+    }
 
-    private ParkingLotService(List<Slot> slots, ISlotFinderStrategy slotFinderStrategy) {
-        this.slots = slots;
-        this.slotFinderStrategy = slotFinderStrategy;
-        for(int slotNo=1; slotNo<=slots.size(); slotNo++) {
-            slotFinderStrategy.addSlot(slotNo);
+    public boolean createParkingLot(ParkingLot parkingLot, ISlotFinderStrategy slotFinderStrategy) throws Exception {
+        if(this.parkingLot != null) {
+            throw new Exception("Parking Lot already created");
         }
-        ticketIdToTicketMap = new HashMap<>();
-    }
 
-    public static ParkingLotService createInstance(List<Slot> slots, ISlotFinderStrategy slotFinderStrategy) {
-        ParkingLotService.parkingLotService = new ParkingLotService(slots, slotFinderStrategy);
-        return parkingLotService;
-    }
-
-    public static ParkingLotService getInstance() {
-        return ParkingLotService.parkingLotService;
+        this.parkingLot = parkingLot;
+        this.slotFinderStrategy = slotFinderStrategy;
+        return true;
     }
 
     public Ticket parkVehicle(@NonNull final String regNo, @NonNull final String color) throws Exception {
@@ -43,56 +33,54 @@ public class ParkingLotService {
             throw new Exception("Parking lot full");
         }
 
-        Slot slot = slots.stream().filter(s -> s.getSlotNo() == slotNo).findAny().get();
-        Ticket ticket = new Ticket(UUID.randomUUID().toString(), regNo, color, slot.getSlotNo());
+        Ticket ticket = new Ticket(UUID.randomUUID().toString(), regNo, color, slotNo);
 
         //Save ticket
-        ticketIdToTicketMap.put(ticket.getId(), ticket);
-        slot.setTicket(ticket);
-        slotFinderStrategy.removeSlot(slot.getSlotNo());
+        parkingLot.addTicket(slotNo, ticket);
+        slotFinderStrategy.removeSlot(slotNo);
         return ticket;
     }
 
     public void unParkVehicle(@NonNull final Integer slotNo) throws Exception {
-        Slot slot = slots.stream().filter(s -> s.getSlotNo().equals(slotNo)).findAny().orElseThrow(
-                () -> new Exception("No slot with given no is avail"));
+        if(!parkingLot.isSlotValid(slotNo)) {
+            throw new Exception("Slot No Invalid");
+        }
 
         //TODO:: validate if slot is free
-        if(slot.isSlotFree()) {
+        if(!parkingLot.isSlotFree(slotNo)) {
             new Exception("Slot is already free");
         }
-        slot.freeSlot();
-        slotFinderStrategy.addSlot(slot.getSlotNo());
+        parkingLot.freeSlot(slotNo);
+        slotFinderStrategy.addSlot(slotNo);
     }
 
     public void getStatus() {
         System.out.println("Slot No. Registration No Colour");
-        for(var slot : slots) {
-            if(!slot.isSlotFree()) {
-                System.out.printf("%7d %15s %6s\n", slot.getSlotNo(), slot.getTicket().getRegNo(),
-                        slot.getTicket().getColor());
+        for(var slot : parkingLot.getSlotNos()) {
+            if(!parkingLot.isSlotFree(slot)) {
+                System.out.printf("%7d %15s %6s\n", slot, parkingLot.getTicket(slot).getRegNo(),
+                        parkingLot.getTicket(slot).getColor());
             }
         }
     }
 
     public List<String> getRegNoForCarWithColor(@NonNull final String color) {
-        return slots.stream().filter(slot -> !slot.isSlotFree())
-                .map(Slot::getTicket)
+        return  parkingLot.getSlotNos().stream().filter(slot -> !parkingLot.isSlotFree(slot))
+                .map(slot -> parkingLot.getTicket(slot))
+                .filter(ticket-> ticket.getColor().equals(color))
                 .map(Ticket::getRegNo)
                 .toList();
     }
 
     public List<Integer> getSlotNosForCarWithColor(@NonNull final String color) {
-        return slots.stream().filter(slot -> !slot.isSlotFree())
-                .filter(slot -> slot.getTicket().getColor().equals(color))
-                .map(Slot::getSlotNo)
+        return parkingLot.getSlotNos().stream().filter(slot -> !parkingLot.isSlotFree(slot))
+                .filter(slot -> parkingLot.getTicket(slot).getColor().equals(color))
                 .toList();
     }
 
     public Integer getSlotNoForRegNo(@NonNull final String regNo) throws Exception {
-        return slots.stream().filter(slot -> !slot.isSlotFree())
-                .filter(slot -> slot.getTicket().getRegNo().equals(regNo))
-                .map(Slot::getSlotNo)
+        return parkingLot.getSlotNos().stream().filter(slot -> !parkingLot.isSlotFree(slot))
+                .filter(slot -> parkingLot.getTicket(slot).getRegNo().equals(regNo))
                 .findFirst().orElseThrow(() -> new Exception("Not found"));
     }
 }

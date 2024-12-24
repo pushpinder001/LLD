@@ -2,7 +2,11 @@ package com.project.app.command.strategy;
 
 import com.project.app.service.ParkingLotService;
 
-public class StatusCommandHandler implements ICommandHandler{
+public class StatusCommandHandler extends ICommandHandler{
+    public StatusCommandHandler(ParkingLotService parkingLotService) {
+        super(parkingLotService);
+    }
+
     @Override
     public boolean validateParams(String[] params) {
         return true;
@@ -15,6 +19,6 @@ public class StatusCommandHandler implements ICommandHandler{
 
     @Override
     public void execute(String[] params) {
-        ParkingLotService.getInstance().getStatus();
+        parkingLotService.getStatus();
     }
 }
