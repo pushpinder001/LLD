@@ -13,10 +13,10 @@ public class App {
     private static CommandRunner commandRunner;
     private static Scanner scanner = new Scanner(System.in);
     public static void main(String[] args) {
-        commandRunner = new CommandRunner(List.of(new CreateParkingLotCommandStrategy(),
-                new ParkVehicleCommandStrategy(), new LeaveVehicleCommandStrategy(),
-                new StatusCommandStrategy(), new GetRegistrationNoForColorCommandStrategy(),
-                new GetSlotNoForRegNoCommandStrategy(), new GetSlotNosForCarColorCommandStrategy()));
+        commandRunner = new CommandRunner(List.of(new CreateParkingLotCommandHandler(),
+                new ParkVehicleCommandHandler(), new LeaveVehicleCommandHandler(),
+                new StatusCommandHandler(), new GetRegistrationNoForColorCommandHandler(),
+                new GetSlotNoForRegNoCommandHandler(), new GetSlotNosForCarColorCommandHandler()));
 
         while(true) {
             System.out.println("Enter command : ");

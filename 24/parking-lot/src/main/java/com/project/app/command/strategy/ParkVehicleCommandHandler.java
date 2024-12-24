@@ -3,7 +3,7 @@ package com.project.app.command.strategy;
 import com.project.app.entity.Ticket;
 import com.project.app.service.ParkingLotService;
 
-public class ParkVehicleCommandStrategy implements ICommandStrategy{
+public class ParkVehicleCommandHandler implements ICommandHandler{
     @Override
     public boolean validateParams(String[] params) {
         return params.length>1;

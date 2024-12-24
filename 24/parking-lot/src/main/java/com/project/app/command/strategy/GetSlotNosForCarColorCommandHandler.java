@@ -4,7 +4,7 @@ import com.project.app.service.ParkingLotService;
 
 import java.util.List;
 
-public class GetSlotNosForCarColorCommandStrategy implements ICommandStrategy{
+public class GetSlotNosForCarColorCommandHandler implements ICommandHandler{
     @Override
     public boolean validateParams(String[] params) {
         return params.length>0;

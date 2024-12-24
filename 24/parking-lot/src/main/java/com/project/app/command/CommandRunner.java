@@ -1,14 +1,14 @@
 package com.project.app.command;
 
-import com.project.app.command.strategy.ICommandStrategy;
+import com.project.app.command.strategy.ICommandHandler;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class CommandRunner {
-    List<ICommandStrategy> commandStrategies;
+    List<ICommandHandler> commandStrategies;
 
-    public CommandRunner(List<ICommandStrategy> commandStrategies) {
+    public CommandRunner(List<ICommandHandler> commandStrategies) {
         this.commandStrategies = commandStrategies;
     }
 
@@ -16,7 +16,7 @@ public class CommandRunner {
         String[] splits = cmd.split(" ");
         String commandString = splits[0];
 
-        ICommandStrategy cmdStr = null;
+        ICommandHandler cmdStr = null;
         for(var commandStrategy : commandStrategies) {
             if(commandStrategy.doYouHandleIt(commandString)) {
                 cmdStr = commandStrategy;

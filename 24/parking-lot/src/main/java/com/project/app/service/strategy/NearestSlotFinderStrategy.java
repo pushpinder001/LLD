@@ -1,18 +1,24 @@
 package com.project.app.service.strategy;
 
-import com.project.app.entity.Slot;
-
-import java.util.List;
+import java.util.TreeSet;
 
 public class NearestSlotFinderStrategy implements ISlotFinderStrategy{
-    @Override
-    public Slot getSlot(List<Slot> slots) {
-        for(var slot : slots) {
-            if(slot.isSlotFree()) {
-                return slot;
-            }
-        }
+    TreeSet<Integer> slotNos = new TreeSet<>();
 
-        return null;
+    @Override
+    public boolean addSlot(int slotNo) {
+        slotNos.add(slotNo);
+        return false;
+    }
+
+    @Override
+    public boolean removeSlot(int slotNo) {
+        slotNos.remove(slotNo);
+        return true;
+    }
+
+    @Override
+    public Integer getSlot() {
+        return slotNos.pollFirst();
     }
 }

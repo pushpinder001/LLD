@@ -1,7 +1,7 @@
 package com.project.app.command.strategy;
 
 
-public interface ICommandStrategy {
+public interface ICommandHandler {
     boolean validateParams(String[] params);
     boolean doYouHandleIt(String cmd);
     void execute(String[] params);

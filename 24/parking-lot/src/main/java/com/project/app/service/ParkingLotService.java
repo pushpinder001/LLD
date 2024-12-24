@@ -21,6 +21,9 @@ public class ParkingLotService {
     private ParkingLotService(List<Slot> slots, ISlotFinderStrategy slotFinderStrategy) {
         this.slots = slots;
         this.slotFinderStrategy = slotFinderStrategy;
+        for(int slotNo=1; slotNo<=slots.size(); slotNo++) {
+            slotFinderStrategy.addSlot(slotNo);
+        }
         ticketIdToTicketMap = new HashMap<>();
     }
 
@@ -34,17 +37,19 @@ public class ParkingLotService {
     }
 
     public Ticket parkVehicle(@NonNull final String regNo, @NonNull final String color) throws Exception {
-        Slot slot = slotFinderStrategy.getSlot(slots);
+        Integer slotNo = slotFinderStrategy.getSlot();
 
-        if(slot == null) {
+        if(slotNo == null) {
             throw new Exception("Parking lot full");
         }
 
+        Slot slot = slots.stream().filter(s -> s.getSlotNo() == slotNo).findAny().get();
         Ticket ticket = new Ticket(UUID.randomUUID().toString(), regNo, color, slot.getSlotNo());
 
         //Save ticket
         ticketIdToTicketMap.put(ticket.getId(), ticket);
         slot.setTicket(ticket);
+        slotFinderStrategy.removeSlot(slot.getSlotNo());
         return ticket;
     }
 
@@ -53,7 +58,11 @@ public class ParkingLotService {
                 () -> new Exception("No slot with given no is avail"));
 
         //TODO:: validate if slot is free
+        if(slot.isSlotFree()) {
+            new Exception("Slot is already free");
+        }
         slot.freeSlot();
+        slotFinderStrategy.addSlot(slot.getSlotNo());
     }
 
     public void getStatus() {

@@ -2,9 +2,7 @@ package com.project.app.command.strategy;
 
 import com.project.app.service.ParkingLotService;
 
-import java.util.List;
-
-public class GetSlotNoForRegNoCommandStrategy implements ICommandStrategy{
+public class LeaveVehicleCommandHandler implements ICommandHandler{
     @Override
     public boolean validateParams(String[] params) {
         return params.length>0;
@@ -12,14 +10,15 @@ public class GetSlotNoForRegNoCommandStrategy implements ICommandStrategy{
 
     @Override
     public boolean doYouHandleIt(String cmd) {
-        return "slot_number_for_registration_number".equals(cmd);
+        return "leave".equals(cmd);
     }
 
     @Override
     public void execute(String[] params) {
+        int slotNo = Integer.parseInt(params[0]);
         try {
-            Integer regNo = ParkingLotService.getInstance().getSlotNoForRegNo(params[0]);
-            System.out.println(regNo);
+            ParkingLotService.getInstance().unParkVehicle(slotNo);
+            System.out.printf("Slot number %d is free\n", slotNo);
         } catch (Exception e) {
             System.out.println("Not found");
         }
